@@ -38,40 +38,47 @@ async fn about(
     Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
+// #[get("/")]
+// async fn index(
+//     _req: HttpRequest,
+//     tmpl: web::Data<Tera>,
+//     db: web::Data<Pool>,
+// ) -> Result<HttpResponse, AWError> {
+//     let result = db::most_matches_played(&db).await;
+
+//     let mut ctx = tera::Context::new();
+
+//     match result {
+//         Ok(r) => {
+//             ctx.insert("total_matches", &r);
+//         },
+//         Err(err) => {
+//             log::error!("Error getting most matches: {}", err);
+//         },
+//     };
+
+//     let result = db::recent_winners(&db).await;
+
+//     match result {
+//         Ok(r) => {
+//             ctx.insert("recent_winners", &r);
+//         },
+//         Err(err) => {
+//             log::error!("Error getting winrates: {}", err);
+//         },
+//     }
+
+//     let s = tmpl
+//         .render("index.html", &ctx)
+//         .map_err(|e| error::ErrorInternalServerError(format!("Tera error:
+// {}", e)))?;     Ok(HttpResponse::Ok().content_type("text/html").body(s))
+// }
+
 #[get("/")]
-async fn index(
-    _req: HttpRequest,
-    tmpl: web::Data<Tera>,
-    db: web::Data<Pool>,
-) -> Result<HttpResponse, AWError> {
-    let result = db::most_matches_played(&db).await;
-
-    let mut ctx = tera::Context::new();
-
-    match result {
-        Ok(r) => {
-            ctx.insert("total_matches", &r);
-        },
-        Err(err) => {
-            log::error!("Error getting most matches: {}", err);
-        },
-    };
-
-    let result = db::recent_winners(&db).await;
-
-    match result {
-        Ok(r) => {
-            ctx.insert("recent_winners", &r);
-        },
-        Err(err) => {
-            log::error!("Error getting winrates: {}", err);
-        },
-    }
-
-    let s = tmpl
-        .render("index.html", &ctx)
-        .map_err(|e| error::ErrorInternalServerError(format!("Tera error: {}", e)))?;
-    Ok(HttpResponse::Ok().content_type("text/html").body(s))
+async fn index() -> Result<HttpResponse, AWError> {
+    Ok(HttpResponse::Ok()
+        .content_type("text/html")
+        .body("hello, world"))
 }
 
 #[get("/search/{tag}")]
@@ -187,12 +194,12 @@ async fn main() -> std::io::Result<()> {
         true => env_logger::init_from_env(env_logger::Env::new().default_filter_or("debug")),
     }
 
-    let manager = match cfg!(debug_assertions) {
-        false => SqliteConnectionManager::file("/data/db/test.db"),
-        true => SqliteConnectionManager::file("test.db"),
-    };
+    // let manager = match cfg!(debug_assertions) {
+    //     false => SqliteConnectionManager::file("/data/db/test.db"),
+    //     true => SqliteConnectionManager::file("test.db"),
+    // };
 
-    let pool = Pool::new(manager).unwrap();
+    // let pool = Pool::new(manager).unwrap();
 
     log::warn!("starting http server at http://localhost:8080");
 
@@ -206,13 +213,13 @@ async fn main() -> std::io::Result<()> {
         };
         App::new()
             .app_data(web::Data::new(tera))
-            .app_data(web::Data::new(pool.clone()))
+            // .app_data(web::Data::new(pool.clone()))
             .wrap(middleware::Logger::default())
             .service(Files::new("/static", "static/"))
             .service(index)
-            .service(search)
-            .service(player)
-            .service(about)
+        // .service(search)
+        // .service(player)
+        // .service(about)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
