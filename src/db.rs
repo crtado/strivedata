@@ -147,48 +147,6 @@ fn get_most_matches_played(conn: Connection) -> Result<Vec<PlayerIntMetric>, rus
     .and_then(Iterator::collect)
 }
 
-pub async fn highest_winrate(pool: &Pool) -> Result<Vec<PlayerFloatMetric>, Error> {
-    let pool = pool.clone();
-    let conn = web::block(move || pool.get())
-        .await?
-        .map_err(error::ErrorInternalServerError)?;
-
-    web::block(move || get_highest_winrate(conn))
-        .await?
-        .map_err(error::ErrorInternalServerError)
-}
-
-// get the top 20 winrates (where total matches played > 20)
-fn get_highest_winrate(conn: Connection) -> Result<Vec<PlayerFloatMetric>, rusqlite::Error> {
-    let mut stmt = conn.prepare(
-        "select 
-            sum(case
-                when sets.set_winner = player.player_id then set_winner_score
-                else sets.set_loser_score
-            end) * 1.0 / sum( sets.set_winner_score + sets.set_loser_score) as winrate,
-            player.player_id, 
-            player.player_tag, 
-            player.player_prefix
-        from
-            sets
-        inner join player on sets.set_winner=player.player_id
-        or sets.set_loser=player.player_id
-        group by player.player_id
-        order by winrate desc
-        limit 20",
-    )?;
-
-    stmt.query_map([], |row| {
-        Ok(PlayerFloatMetric {
-            metric: row.get(0)?,
-            id: row.get(1)?,
-            tag: row.get(2)?,
-            prefix: row.get(3)?,
-        })
-    })
-    .and_then(Iterator::collect)
-}
-
 pub async fn player_metrics(pool: &Pool, id: i32) -> Result<Vec<i32>, Error> {
     let pool = pool.clone();
     let conn = web::block(move || pool.get())
