@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}
+Search
+{% endblock title %}
+{% block header %}
+Search Results
+{% endblock header%}
+{% block content %}
+<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div>
+        <ul role="list" class="py-10 divide-y divide-gray-200 max-w-md">
+            {% for player in players %}
+            {% set prefix_length = player.prefix | trim | length %}
+
+            <li class="hover:bg-gray-300 hover:font-bold hover:underline hover:text-red-600 hover:border-gray-300">
+                <a class="block py-3" href="/player/{{player.id}}">
+                    <div class="ml-3">
+                        {% if prefix_length > 0 %}
+                        <span class="text-lg font-normal text-inherit">{{ player.prefix }} | </span>
+                        {% endif %}
+                        <span class="text-lg font-semibold text-inherit">
+                            {{ player.tag }}
+                        </span>
+                    </div>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock content %}

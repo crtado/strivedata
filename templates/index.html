@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}
+Home
+{% endblock title %}
+{% block header %}
+-Strive- Player Database
+{% endblock header%}
+{% block content %}
+<div class="max-w-full mx-auto sm:px-6 lg:px-8">
+  <div class="grid grid-cols-1 gap-8 pt-4 sm:grid-cols-2">
+    <!-- First Table -->
+    <div class="px-4">
+      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl">Recent Winners</h2>
+      <div class="mt-8 flex flex-col">
+        <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div class="inline-block min-w-full py-1 align-middle md:px-6 lg:px-8">
+            <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+              <table class="min-w-full divide-y divide-gray-300">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      <span class="sr-only">Index/span>
+                    </th>
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                      Player
+                    </th>
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                      Placement
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                  {% set_global tournament_name = "" %}
+                  {% for standing in recent_winners %}
+                  {% set prefix_length = standing.player_prefix | trim | length %}
+
+                  {% if tournament_name != standing.tournament_name %}
+                  {% set_global tournament_name = standing.tournament_name %}
+                  <tr class="border-t border-gray-200">
+                    <th colspan="3" scope="colgroup"
+                      class="bg-gray-100 px-4 py-2 text-center text-lg font-bold text-black sm:px-6">
+                      {{standing.tournament_name}}
+                    </th>
+                  </tr>
+                  {% endif %}
+
+                  <tr>
+                    <td></td>
+                    <td class="whitespace-nowrap px-3 py-2 font-bold text-lg text-black">
+                      <a class="block hover:underline hover:text-red-600" href="/player/{{standing.player_id}}">
+                        {% if prefix_length == 0 %}
+                        {{ standing.player_tag }}
+                        {% else %}
+                        {{ standing.player_prefix }} | {{ standing.player_tag }}
+                        {% endif %}
+                      </a>
+                    </td>
+
+                    <td class="whitespace-nowrap px-3 py-2 font-bold text-lg text-black">
+                      {{standing.placement}}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Second Table -->
+    <div class="px-4">
+      <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl">Most Matches Played</h2>
+      <div class="mt-8 flex flex-col">
+        <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div class="inline-block min-w-full py-1 align-middle md:px-6 lg:px-8">
+            <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+              <table class="min-w-full divide-y divide-gray-300">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                      <span class="sr-only">Index</span>
+                    </th>
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name
+                    </th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Matches Played
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                  {% for player in total_matches %}
+                  {% set prefix_length = player.prefix | trim | length %}
+                  <tr>
+                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-lg font-bold text-gray-900 sm:pl-6">{{loop.index}}
+                    </td>
+
+                    <td class="whitespace-nowrap px-3 py-2 text-lg text-gray-500">
+                      <a class="block hover:underline hover:text-red-600" href="/player/{{player.id}}">
+                        {% if prefix_length == 0 %}
+                        {{ player.tag }}
+                        {% else %}
+                        {{player.prefix}} | {{player.tag}}
+                        {% endif %}
+                      </a>
+                    </td>
+
+                    <td class="whitespace-nowrap px-3 py-2 text-lg text-gray-500">
+                      {{ player.metric }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,5 @@
+/target
+/dev
+
+rustfmt.toml
+*.db*
