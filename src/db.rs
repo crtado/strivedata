@@ -13,16 +13,8 @@ pub struct Player {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct PlayerIntMetric {
+pub struct PlayerMetric {
     metric: i32,
-    id: i32,
-    tag: String,
-    prefix: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct PlayerFloatMetric {
-    metric: f32,
     id: i32,
     tag: String,
     prefix: String,
@@ -71,7 +63,7 @@ fn get_players_by_tag(conn: Connection, tag: &String) -> Result<Vec<Player>, rus
         from 
             player 
         where 
-            lower(player_tag) like lower('%{}%') 
+            lower(tag) like lower('%{}%') 
             and exclude==0",
         tag
     ))?;
@@ -97,7 +89,7 @@ pub async fn player_by_id(pool: &Pool, id: i32) -> Result<Player, Error> {
 }
 
 fn get_player_by_id(conn: Connection, id: &i32) -> Result<Player, rusqlite::Error> {
-    let mut stmt = conn.prepare(&format!("select * from player where player_id = {}", id))?;
+    let mut stmt = conn.prepare(&format!("select * from player where id = {}", id))?;
 
     stmt.query_row([], |row| {
         Ok(Player {
@@ -108,7 +100,7 @@ fn get_player_by_id(conn: Connection, id: &i32) -> Result<Player, rusqlite::Erro
     })
 }
 
-pub async fn most_matches_played(pool: &Pool) -> Result<Vec<PlayerIntMetric>, Error> {
+pub async fn most_matches_played(pool: &Pool) -> Result<Vec<PlayerMetric>, Error> {
     let pool = pool.clone();
     let conn = web::block(move || pool.get())
         .await?
@@ -120,24 +112,24 @@ pub async fn most_matches_played(pool: &Pool) -> Result<Vec<PlayerIntMetric>, Er
 }
 
 // get the top 20 amount of matches played
-fn get_most_matches_played(conn: Connection) -> Result<Vec<PlayerIntMetric>, rusqlite::Error> {
+fn get_most_matches_played(conn: Connection) -> Result<Vec<PlayerMetric>, rusqlite::Error> {
     let mut stmt = conn.prepare(
         "select
-            sum( sets.set_winner_score + sets.set_loser_score) as total, 
-            player.player_id, 
-            player.player_tag, 
-            player.player_prefix 
+            sum( sets.win_score + sets.lose_score) as total, 
+            player.id, 
+            player.tag, 
+            player.prefix 
         from
             sets
-        inner join player on sets.set_winner=player.player_id
-        or sets.set_loser=player.player_id
-        group by player.player_id
+        inner join player on sets.win_id=player.id
+        or sets.lose_id=player.id
+        group by player.id
         order by total desc
         limit 20",
     )?;
 
     stmt.query_map([], |row| {
-        Ok(PlayerIntMetric {
+        Ok(PlayerMetric {
             metric: row.get(0)?,
             id: row.get(1)?,
             tag: row.get(2)?,
@@ -166,7 +158,7 @@ fn get_player_metrics(conn: Connection, id: &i32) -> Result<Vec<i32>, rusqlite::
         from
             sets
         where
-            set_winner = {}
+            win_id = {}
         ",
         id
     ))?;
@@ -180,9 +172,9 @@ fn get_player_metrics(conn: Connection, id: &i32) -> Result<Vec<i32>, rusqlite::
         from
             sets
         where
-            set_winner = {}
+            win_id = {}
         or
-            set_loser = {}
+            lose_id = {}
         ",
         id, id
     ))?;
@@ -193,15 +185,15 @@ fn get_player_metrics(conn: Connection, id: &i32) -> Result<Vec<i32>, rusqlite::
         "
         select
             sum(case
-                when set_winner = {} then set_winner_score
-                else set_loser_score
+                when win_id = {} then win_score
+                else lose_score
             end)
         from
             sets
         where
-            set_winner = {}
+            win_id = {}
         or
-            set_loser = {}
+            lose_id = {}
         ",
         id, id, id
     ))?;
@@ -211,13 +203,13 @@ fn get_player_metrics(conn: Connection, id: &i32) -> Result<Vec<i32>, rusqlite::
     let mut stmt = conn.prepare(&format!(
         "
         select
-            sum( set_winner_score + set_loser_score)
+            sum( win_score + lose_score)
         from
             sets
         where
-            set_winner = {}
+            win_id = {}
         or
-            set_loser = {}
+            lose_id = {}
         ",
         id, id
     ))?;
@@ -242,19 +234,19 @@ fn get_recent_winners(conn: Connection) -> Result<Vec<Standing>, rusqlite::Error
     let mut stmt = conn.prepare(
         "
         select
-            standing.standing_placement as place,
+            standing.placement as place,
             event.tournament_name,
-            standing.standing_player,
-            player.player_tag,
-            player.player_prefix
+            standing.player_id,
+            player.tag,
+            player.prefix
         from
             standing
         inner join event on
-            standing.standing_event=event.event_id
+            standing.event_id=event.id
             and (place == 1 or place == 2 or place == 3)
         inner join player on
-            standing.standing_player=player.player_id
-        order by event.event_start desc
+            standing.player_id=player.id
+        order by event.start desc
         limit 15
         ",
     )?;
@@ -286,14 +278,14 @@ fn get_player_standings(conn: Connection, id: &i32) -> Result<Vec<Standing>, rus
     let mut stmt = conn.prepare(&format!(
         "
         select
-            standing.standing_placement,
+            standing.placement,
             event.tournament_name
         from
             standing
         inner join event on
-            standing.standing_event=event.event_id
-            and standing.standing_player={}
-        order by event.event_start desc
+            standing.event_id=event.id
+            and standing.player_id={}
+        order by event.start desc
         limit 20
         ",
         id
@@ -326,29 +318,29 @@ fn get_player_sets(conn: Connection, id: &i32) -> Result<Vec<Set>, rusqlite::Err
     let mut stmt = conn.prepare(&format!(
         "
         select
-            sets.set_id,
-            event.event_id,
-            event.event_name,
+            sets.id,
+            event.id,
+            event.name,
             event.tournament_name,
-            sets.set_round,
-            sets.set_winner,
-            sets.set_winner_score,
-            A.player_tag,
-            A.player_prefix,
-            sets.set_loser,
-            sets.set_loser_score,
-            B.player_tag,
-            B.player_prefix
+            sets.round,
+            sets.win_id,
+            sets.win_score,
+            A.tag,
+            A.prefix,
+            sets.lose_id,
+            sets.lose_score,
+            B.tag,
+            B.prefix
         from
             sets
         inner join event on
-            sets.set_event=event.event_id
-            and (set_winner={} or set_loser={})
+            sets.event_id=event.id
+            and (win_id={} or lose_id={})
         inner join player A on
-            sets.set_winner=A.player_id
+            sets.win_id=A.id
         inner join player B on
-            sets.set_loser=B.player_id
-        order by sets.set_id desc
+            sets.lose_id=B.id
+        order by sets.id desc
         ",
         id, id
     ))?;
