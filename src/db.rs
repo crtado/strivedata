@@ -24,6 +24,7 @@ pub struct PlayerMetric {
 pub struct Standing {
     placement: i32,
     tournament_name: String,
+    event_slug: String,
     player_id: i32,
     player_tag: String,
     player_prefix: String,
@@ -35,6 +36,7 @@ pub struct Set {
     event: i32,
     event_name: String,
     tournament_name: String,
+    event_slug: String,
     round: String,
     winner: i32,
     winner_score: i32,
@@ -236,6 +238,7 @@ fn get_recent_winners(conn: Connection) -> Result<Vec<Standing>, rusqlite::Error
         select
             standing.placement as place,
             event.tournament_name,
+            event.slug,
             standing.player_id,
             player.tag,
             player.prefix
@@ -255,9 +258,10 @@ fn get_recent_winners(conn: Connection) -> Result<Vec<Standing>, rusqlite::Error
         Ok(Standing {
             placement: row.get(0)?,
             tournament_name: row.get(1)?,
-            player_id: row.get(2)?,
-            player_tag: row.get(3)?,
-            player_prefix: row.get(4)?,
+            event_slug: row.get(2)?,
+            player_id: row.get(3)?,
+            player_tag: row.get(4)?,
+            player_prefix: row.get(5)?,
         })
     })
     .and_then(Iterator::collect)
@@ -279,7 +283,8 @@ fn get_player_standings(conn: Connection, id: &i32) -> Result<Vec<Standing>, rus
         "
         select
             standing.placement,
-            event.tournament_name
+            event.tournament_name,
+            event.slug
         from
             standing
         inner join event on
@@ -295,6 +300,7 @@ fn get_player_standings(conn: Connection, id: &i32) -> Result<Vec<Standing>, rus
         Ok(Standing {
             placement: row.get(0)?,
             tournament_name: row.get(1)?,
+            event_slug: row.get(2)?,
             player_id: 0,
             player_tag: "".to_string(),
             player_prefix: "".to_string(),
@@ -322,6 +328,7 @@ fn get_player_sets(conn: Connection, id: &i32) -> Result<Vec<Set>, rusqlite::Err
             event.id,
             event.name,
             event.tournament_name,
+            event.slug,
             sets.round,
             sets.win_id,
             sets.win_score,
@@ -351,15 +358,16 @@ fn get_player_sets(conn: Connection, id: &i32) -> Result<Vec<Set>, rusqlite::Err
             event: row.get(1)?,
             event_name: row.get(2)?,
             tournament_name: row.get(3)?,
-            round: row.get(4)?,
-            winner: row.get(5)?,
-            winner_score: row.get(6)?,
-            winner_tag: row.get(7)?,
-            winner_prefix: row.get(8)?,
-            loser: row.get(9)?,
-            loser_score: row.get(10)?,
-            loser_tag: row.get(11)?,
-            loser_prefix: row.get(12)?,
+            event_slug: row.get(4)?,
+            round: row.get(5)?,
+            winner: row.get(6)?,
+            winner_score: row.get(7)?,
+            winner_tag: row.get(8)?,
+            winner_prefix: row.get(9)?,
+            loser: row.get(10)?,
+            loser_score: row.get(11)?,
+            loser_tag: row.get(12)?,
+            loser_prefix: row.get(13)?,
         })
     })
     .and_then(Iterator::collect)

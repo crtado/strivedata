@@ -87,8 +87,11 @@
                                             {{ standing.placement }}
                                         </td>
 
-                                        <td class="whitespace-nowrap px-3 py-2 text-sm font-bold text-black">
-                                            {{standing.tournament_name}}
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm font-bold text-sky-900">
+                                            <a class="block hover:underline"
+                                                href="{{base_url}}{{standing.event_slug}}/overview">
+                                                {{standing.tournament_name}}
+                                            </a>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -132,7 +135,11 @@
                                     <tr class="border-t border-gray-200">
                                         <th colspan="3" scope="colgroup"
                                             class="bg-gray-100 px-4 py-2 text-center text-sm font-bold text-black sm:px-6">
-                                            {{set.tournament_name}}
+
+                                            <a class="block hover:underline"
+                                                href="{{base_url}}{{set.event_slug}}/overview">
+                                                {{set.tournament_name}}
+                                            </a>
                                         </th>
                                     </tr>
                                     {% endif %}
@@ -144,24 +151,35 @@
                                         {% endif %}
                                         <td class="whitespace-nowrap px-3 py-2 font-bold text-sm text-black">
                                             {% if set.winner == player.id %}
-                                            {% set opp_prefix_length = set.loser_prefix | trim | length %}
-                                            {% if opp_prefix_length == 0 %}
-                                            {{ set.loser_tag }}
-                                            {% else %}
-                                            {{ set.loser_prefix }} | {{ set.loser_tag }}
-                                            {% endif %}
-                                            {% else %}
-                                            {% set opp_prefix_length = set.winner_prefix | trim | length %}
-                                            {% if opp_prefix_length == 0 %}
-                                            {{ set.winner_tag }}
-                                            {% else %}
-                                            {{ set.winner_prefix }} | {{ set.winner_tag }}
-                                            {% endif %}
-                                            {% endif %}
+                                            <a class="block hover:underline hover:text-red-600"
+                                                href="/player/{{set.loser}}">
+                                                {% else %}
+                                                <a class="block hover:underline hover:text-red-600"
+                                                    href="/player/{{set.winner}}">
+                                                    {% endif %}
+                                                    {% if set.winner == player.id %}
+                                                    {% set opp_prefix_length = set.loser_prefix | trim | length %}
+                                                    {% if opp_prefix_length == 0 %}
+                                                    {{ set.loser_tag }}
+                                                    {% else %}
+                                                    {{ set.loser_prefix }} | {{ set.loser_tag }}
+                                                    {% endif %}
+                                                    {% else %}
+                                                    {% set opp_prefix_length = set.winner_prefix | trim | length %}
+                                                    {% if opp_prefix_length == 0 %}
+                                                    {{ set.winner_tag }}
+                                                    {% else %}
+                                                    {{ set.winner_prefix }} | {{ set.winner_tag }}
+                                                    {% endif %}
+                                                    {% endif %}
+                                                </a>
                                         </td>
 
-                                        <td class="whitespace-nowrap px-3 py-2 font-bold text-sm text-black">
-                                            {{set.round}}
+                                        <td class="whitespace-nowrap px-3 py-2 font-bold text-sm text-sky-900">
+                                            <a class="block hover:underline"
+                                                href="{{base_url}}{{set.event_slug}}/set/{{set.id}}">
+                                                {{set.round}}
+                                            </a>
                                         </td>
 
                                         <td class="whitespace-nowrap px-3 py-2 font-bold text-sm text-black">

@@ -24,7 +24,7 @@ Home
                     <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                       Player
                     </th>
-                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-6">
                       Placement
                     </th>
                   </tr>
@@ -38,8 +38,10 @@ Home
                   {% set_global tournament_name = standing.tournament_name %}
                   <tr class="border-t border-gray-200">
                     <th colspan="3" scope="colgroup"
-                      class="bg-gray-100 px-4 py-2 text-center text-sm font-bold text-black sm:px-6">
-                      {{standing.tournament_name}}
+                      class="bg-gray-100 px-4 py-2 text-center text-sm font-bold text-sky-700 sm:px-6">
+                      <a class="block hover:underline" href="{{base_url}}{{standing.event_slug}}/overview">
+                        {{standing.tournament_name}}
+                      </a>
                     </th>
                   </tr>
                   {% endif %}
@@ -56,7 +58,7 @@ Home
                       </a>
                     </td>
 
-                    <td class="whitespace-nowrap px-3 py-2 font-bold text-sm text-black">
+                    <td class="whitespace-nowrap px-3 py-2 font-bold text-sm text-black text-center">
                       {{standing.placement}}
                     </td>
                   </tr>
