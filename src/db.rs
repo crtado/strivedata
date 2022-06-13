@@ -231,7 +231,7 @@ pub async fn recent_winners(pool: &Pool) -> Result<Vec<Standing>, Error> {
         .map_err(error::ErrorInternalServerError)
 }
 
-// get 15 most recent top-3 placements
+// get 15 most recent top-3 placements, from events with >= 40 entrants
 fn get_recent_winners(conn: Connection) -> Result<Vec<Standing>, rusqlite::Error> {
     let mut stmt = conn.prepare(
         "
@@ -249,7 +249,19 @@ fn get_recent_winners(conn: Connection) -> Result<Vec<Standing>, rusqlite::Error
             and (place == 1 or place == 2 or place == 3)
         inner join player on
             standing.player_id=player.id
-        order by event.start desc
+        where
+            event.id in (
+                select
+                    event_id
+                from
+                    standing
+                group by
+                    event_id
+                having count(*) >= 40
+            )
+        order by
+            event.start desc,
+            standing.placement
         limit 15
         ",
     )?;

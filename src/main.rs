@@ -188,8 +188,8 @@ async fn main() -> std::io::Result<()> {
     }
 
     let manager = match cfg!(debug_assertions) {
-        false => SqliteConnectionManager::file("/data/db/test.db"),
-        true => SqliteConnectionManager::file("test.db"),
+        false => SqliteConnectionManager::file("/data/db/data.db"),
+        true => SqliteConnectionManager::file("data.db"),
     };
 
     let pool = Pool::new(manager).unwrap();

@@ -8,30 +8,55 @@ About
 {% block content %}
 
 <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-  <!-- REMOVE AFTER BETA -->
-  <div class="rounded-md bg-yellow-50 p-2 mb-2 mt-2">
-    <div class="flex">
-      <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-          aria-hidden="true">
-          <path fill-rule="evenodd"
-            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-            clip-rule="evenodd" />
-        </svg>
-      </div>
-      <div class="ml-3">
-        <h3 class="text-base font-semibold text-yellow-800">Work In Progress!</h3>
-        <div class="mt-2 text-base text-yellow-700">
-          <p>At the moment, data is limited to
-            players, matches, & sets taken exclusively from <a href="https://twitter.com/9Moonsgaming"
-              style="font-weight: bold;text-decoration: underline;">9Moons</a>
-            events. After a period of testing, data will be expanded to cover all players, matches, &
-            sets hosted on <span style="font-weight: bold;text-decoration: underline;">start.gg</span>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <p>Placeholder About Text</p>
+  <p>
+    Strivedata is a resource to help players explore competitive
+    <strong><em>Guilty Gear -Strive-</em></strong>
+    tournament data.
+  </p>
+  <p>
+    All data is provided by the official
+    <a href="https://www.start.gg/" class="font-bold hover:underline text-sky-700">
+      start.gg
+    </a> API.
+  </p>
+
+  <br>
+
+  <p>
+    Made by <strong class="text-red-700">crtado</strong>, source on
+    <a href="https://github.com/crtado/strivedata" class="font-bold hover:underline text-sky-700">
+      Github
+    </a>
+  </p>
+
+  <br>
+
+  <h2 class="text-2xl font-bold leading-tight text-gray-900">Other Great Sites</h2>
+  <ul class="list-disc list-inside">
+    <li>
+      <a href="http://ratingupdate.info/" class="font-bold hover:underline text-sky-700">
+        ratingupdate.info
+      </a>
+      &nbsp;The (un)official online leaderboard for Strive.
+      Uses PC replay data to track players & provide skill ratings.
+    </li>
+    <li>
+      <a href="https://www.dustloop.com/wiki/index.php" class="font-bold hover:underline text-sky-700">
+        dustloop
+      </a>
+      &nbsp;The community wiki for Strive & other ArcSys fighting games.
+    </li>
+    <li>
+      <a href="https://smashdata.gg/" class="font-bold hover:underline text-sky-700">
+        smashdata.gg
+      </a>
+      and <a href="https://www.pgstats.com/" class="font-bold hover:underline text-sky-700">
+        pgstats
+      </a>
+      &nbsp;The inspirations for this website.
+      Fantastic resources for competitive Smash Melee, Smash Ultimate, & Strive player data.
+    </li>
+  </ul>
+
 </div>
 {% endblock content %}
